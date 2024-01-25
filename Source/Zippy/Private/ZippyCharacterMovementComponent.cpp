@@ -83,7 +83,8 @@ FSavedMovePtr UZippyCharacterMovementComponent::FNetworkPredictionData_Client_Zi
 
 UZippyCharacterMovementComponent::UZippyCharacterMovementComponent()
 {
-
+	Sprint_MaxWalkSpeed = 500.f;
+	Walk_MaxWalkSpeed = 650.f;
 }
 
 FNetworkPredictionData_Client* UZippyCharacterMovementComponent::GetPredictionData_Client() const

@@ -14,16 +14,21 @@ class ZIPPY_API UZippyCharacterMovementComponent : public UCharacterMovementComp
 {
 	GENERATED_BODY()
 
+	// SavedMove state!  Acceleration
 	class FSavedMove_Zippy : public FSavedMove_Character
 	{
 		typedef FSavedMove_Character Super;
 
 		uint8 Saved_bWantsToSprint : 1;
 
+		// used for optimization, if same as last save move - skip!
 		virtual bool CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const override;
 		virtual void Clear() override;
+		// SavedMove's compressed flags serialized here...
 		virtual uint8 GetCompressedFlags() const override;
+		// saves state from character movement
 		virtual void SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData) override;
+		// saves state to character movement
 		virtual void PrepMoveFor(ACharacter* C) override;
 	};
 
@@ -57,7 +62,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SprintReleased();
-
 
 	UPROPERTY(EditDefaultsOnly)
 	float Sprint_MaxWalkSpeed;
