@@ -3,8 +3,9 @@
 
 #include "ZippyCharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "ZippyCharacter.h"
 
-// start FSavedMove_Zippy
+#pragma region FSavedMove_Zippy
 
 // checks if we can combine these moves - current move and NewMove.
 // if all move in a saved data is same as last - then just return true and cut down on bandwidth.
@@ -64,9 +65,11 @@ void UZippyCharacterMovementComponent::FSavedMove_Zippy::PrepMoveFor(ACharacter*
 	CharacterMovement->Safe_bWantsToSprint = Saved_bWantsToSprint;
 }
 
-// end FSavedMove_Zippy
+#pragma endregion
 
-// start FNetworkPredictionData_Client_Zippy
+
+#pragma region FNetworkPredictionData_Client_Zippy
+
 UZippyCharacterMovementComponent::FNetworkPredictionData_Client_Zippy::FNetworkPredictionData_Client_Zippy(
 	const UCharacterMovementComponent& ClientMovement) : Super(ClientMovement)
 {
@@ -78,13 +81,14 @@ FSavedMovePtr UZippyCharacterMovementComponent::FNetworkPredictionData_Client_Zi
 	return FSavedMovePtr(new FSavedMove_Zippy());
 }
 
-
-// end FNetworkPredictionData_Client_Zippy
+#pragma endregion
 
 UZippyCharacterMovementComponent::UZippyCharacterMovementComponent()
 {
 	Sprint_MaxWalkSpeed = 500.f;
 	Walk_MaxWalkSpeed = 650.f;
+
+	NavAgentProps.bCanCrouch = true;
 }
 
 FNetworkPredictionData_Client* UZippyCharacterMovementComponent::GetPredictionData_Client() const
@@ -102,12 +106,20 @@ FNetworkPredictionData_Client* UZippyCharacterMovementComponent::GetPredictionDa
 	return ClientPredictionData;
 }
 
+void UZippyCharacterMovementComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	ZippyCharacterOwner = Cast<AZippyCharacter>(GetOwner());
+}
+
 void UZippyCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 {
 	Super::UpdateFromCompressedFlags(Flags);
 
 	Safe_bWantsToSprint = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
 }
+
+#pragma region Input
 
 void UZippyCharacterMovementComponent::SprintPressed()
 {
@@ -118,6 +130,13 @@ void UZippyCharacterMovementComponent::SprintReleased()
 {
 	Safe_bWantsToSprint = false;
 }
+
+void UZippyCharacterMovementComponent::CrouchPressed()
+{
+	bWantsToCrouch = !bWantsToCrouch;
+}
+
+#pragma endregion
 
 void UZippyCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
 {
@@ -134,4 +153,9 @@ void UZippyCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, con
 			MaxWalkSpeed = Walk_MaxWalkSpeed;
 		}
 	}
+}
+
+bool UZippyCharacterMovementComponent::IsCustomMovementMode(ECustomMovementMode InCustomMovementMode) const
+{
+	return MovementMode == MOVE_Custom && CustomMovementMode == InCustomMovementMode;
 }

@@ -6,9 +6,16 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ZippyCharacterMovementComponent.generated.h"
 
-/**
- * 
- */
+class AZippyCharacter;
+
+UENUM(BlueprintType)
+enum ECustomMovementMode
+{
+	CMOVE_None UMETA(Hidden),
+	CMOVE_Slide UMETA(DisplayName = "Slide"),
+	CMOVE_Max UMETA(Hidden),
+};
+
 UCLASS()
 class ZIPPY_API UZippyCharacterMovementComponent : public UCharacterMovementComponent
 {
@@ -47,25 +54,28 @@ class ZIPPY_API UZippyCharacterMovementComponent : public UCharacterMovementComp
 public:
 	UZippyCharacterMovementComponent();
 public:
+	// using our FNetworkPredictionDatay_Client_Zippy type
 	virtual FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 protected:
-	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 
+	virtual void InitializeComponent() override;
+
+	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 
 	// called at any perform move. 
 	// write movemenet logic regardless of our movement mode
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void SprintPressed();
+	UFUNCTION(BlueprintCallable) void SprintPressed();
+	UFUNCTION(BlueprintCallable) void SprintReleased();
 
-	UFUNCTION(BlueprintCallable)
-	void SprintReleased();
+	UFUNCTION(BlueprintCallable) void CrouchPressed();
 
-	UPROPERTY(EditDefaultsOnly)
-	float Sprint_MaxWalkSpeed;
+	UPROPERTY(EditDefaultsOnly) float Sprint_MaxWalkSpeed;
+	UPROPERTY(EditDefaultsOnly) float Walk_MaxWalkSpeed;
 
-	UPROPERTY(EditDefaultsOnly)
-	float Walk_MaxWalkSpeed;
+	UPROPERTY(Transient) AZippyCharacter* ZippyCharacterOwner;
+
+	UFUNCTION(BlueprintPure) bool IsCustomMovementMode(ECustomMovementMode InCustomMovementMode) const;
 };
