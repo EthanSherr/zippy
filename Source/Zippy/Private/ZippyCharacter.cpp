@@ -74,6 +74,18 @@ void AZippyCharacter::BeginPlay()
 	}
 }
 
+FCollisionQueryParams AZippyCharacter::GetIgnoreCharacterParams()
+{
+	FCollisionQueryParams Params = FCollisionQueryParams();
+
+	TArray<AActor*> CharacterChildren;
+	GetAllChildActors(CharacterChildren);
+	Params.AddIgnoredActors(CharacterChildren);
+	Params.AddIgnoredActor(this);
+
+	return Params;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 

@@ -72,5 +72,6 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE UZippyCharacterMovementComponent* GetZippyCharacterMovement() const { return ZippyCharacterMovementComponent; }
+	FCollisionQueryParams GetIgnoreCharacterParams();
 };
 
